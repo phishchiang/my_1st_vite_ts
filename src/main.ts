@@ -25,26 +25,28 @@ import fs_plane from './shader/fs_plane.frag?raw'
     private gui: dat.GUI
     private gltf_loader: GLTFLoader
     private draco_loader: DRACOLoader
+    private settings: object
 
     constructor(options: { dom: HTMLElement }) {
-      this.scene = new THREE.Scene();
+      this.scene = new THREE.Scene()
       this.container = options.dom;
-      this.width = this.container.offsetWidth;
-      this.height = this.container.offsetHeight;
-      this.renderer = new THREE.WebGLRenderer();
-      this.renderer.setPixelRatio(window.devicePixelRatio);
-      this.renderer.setSize(this.width, this.height);
-      this.renderer.setClearColor(0x000000, 1); 
-      this.renderer.physicallyCorrectLights = true;
+      this.width = this.container.offsetWidth
+      this.height = this.container.offsetHeight
+      this.renderer = new THREE.WebGLRenderer()
+      this.renderer.setPixelRatio(window.devicePixelRatio)
+      this.renderer.setSize(this.width, this.height)
+      this.renderer.setClearColor(0x000000, 1)
+      this.renderer.physicallyCorrectLights = true
       this.render = this.render.bind(this)
+      this.imageAspect = 1
 
-      this.gltf_loader = new GLTFLoader();
-      this.draco_loader = new DRACOLoader();
-      this.draco_loader.setDecoderConfig({ type: 'js' });
+      this.gltf_loader = new GLTFLoader()
+      this.draco_loader = new DRACOLoader()
+      this.draco_loader.setDecoderConfig({ type: 'js' })
       this.draco_loader.setDecoderPath('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/'); // use a full url path
-      this.gltf_loader.setDRACOLoader(this.draco_loader);
+      this.gltf_loader.setDRACOLoader(this.draco_loader)
 
-      this.container.appendChild(this.renderer.domElement);
+      this.container.appendChild(this.renderer.domElement)
       this.camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
@@ -61,10 +63,10 @@ import fs_plane from './shader/fs_plane.frag?raw'
       this.resize();
       this.render();
       this.setupResize();
-      // this.settings();
+      this.datGui();
     }
 
-    settings() {
+    datGui() {
       let that = this;
       this.settings = {
         progress: 0.6,
@@ -86,7 +88,6 @@ import fs_plane from './shader/fs_plane.frag?raw'
       
   
       // image cover
-      this.imageAspect = 1;
       let a1; let a2;
       if(this.height/this.width>this.imageAspect) {
         a1 = (this.width/this.height) * this.imageAspect ;
