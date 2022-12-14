@@ -1,8 +1,8 @@
 import './style.css'
 import { WebGLRenderer, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, Vector4 } from 'three'
-import { GUI } from "dat.gui"
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { gltf_loader } from "./glb_loader"
+import { Debug } from "./Debug"
 
 import vs_plane from './shader/vs_plane.vert?raw'
 import fs_plane from './shader/fs_plane.frag?raw'
@@ -22,8 +22,7 @@ export class Sketch {
   private mat_plane: ShaderMaterial
   private geo_plane: PlaneGeometry
   private msh_plane: Mesh
-  private gui: dat.GUI
-  private settings: object
+  private my_debug: Debug
   private msh_monkey: Mesh
 
   constructor(options: { dom: HTMLElement }) {
@@ -38,6 +37,7 @@ export class Sketch {
     this.renderer.physicallyCorrectLights = true
     this.render = this.render.bind(this)
     this.imageAspect = 1
+    this.my_debug = new Debug()
 
     this.container.appendChild(this.renderer.domElement)
     this.camera = new PerspectiveCamera(
@@ -56,17 +56,8 @@ export class Sketch {
     this.resize()
     this.render()
     this.setupResize()
-    this.datGui()
   }
 
-  datGui() {
-    let that = this
-    this.settings = {
-      progress: 0.6,
-    }
-    this.gui = new GUI()
-    this.gui.add(this.settings, "progress", 0, 5, 0.01)
-  }
 
   setupResize() {
     window.addEventListener("resize", this.resize.bind(this))
@@ -144,6 +135,7 @@ export class Sketch {
     if (!this.isPlaying) return
     this.time += 0.05
     this.mat_plane.uniforms.time.value = this.time
+    this.mat_plane.uniforms.progress.value = this.my_debug.settings.progress
     requestAnimationFrame(this.render)
     this.renderer.render(this.scene, this.camera)
   }
