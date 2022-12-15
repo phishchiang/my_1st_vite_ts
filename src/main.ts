@@ -6,7 +6,7 @@ import { Debug } from "./Debug"
 
 import vs_plane from './shader/vs_plane.vert?raw'
 import fs_plane from './shader/fs_plane.frag?raw'
-import MSH_Monkey from "./model/MSH_Monkey.glb?url"
+import MSH_Monkey_url from "./model/MSH_Monkey.glb?url"
 
 export class Sketch {
   private renderer: WebGLRenderer
@@ -22,7 +22,7 @@ export class Sketch {
   private mat_plane: ShaderMaterial
   private geo_plane: PlaneGeometry
   private msh_plane: Mesh
-  private my_debug: Debug
+  private debug: Debug
   private msh_monkey: Mesh
 
   constructor(options: { dom: HTMLElement }) {
@@ -37,7 +37,7 @@ export class Sketch {
     this.renderer.physicallyCorrectLights = true
     this.render = this.render.bind(this)
     this.imageAspect = 1
-    this.my_debug = new Debug()
+    this.debug = new Debug()
 
     this.container.appendChild(this.renderer.domElement)
     this.camera = new PerspectiveCamera(
@@ -108,11 +108,10 @@ export class Sketch {
     this.msh_plane = new Mesh(this.geo_plane,this.mat_plane)
     this.scene.add(this.msh_plane)
 
-    gltf_loader.load(MSH_Monkey, glb => {
+    gltf_loader.load(MSH_Monkey_url, glb => {
       this.msh_monkey = glb.scenes[0].children[0] as Mesh
       this.msh_monkey.traverse(o=>{
         if(o instanceof Mesh){
-          // console.log(o);
           o.material = this.mat_plane;
         }
       })
@@ -135,7 +134,7 @@ export class Sketch {
     if (!this.isPlaying) return
     this.time += 0.05
     this.mat_plane.uniforms.time.value = this.time
-    this.mat_plane.uniforms.progress.value = this.my_debug.settings.progress
+    this.mat_plane.uniforms.progress.value = this.debug.settings.progress
     requestAnimationFrame(this.render)
     this.renderer.render(this.scene, this.camera)
   }
