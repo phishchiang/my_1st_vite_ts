@@ -1,12 +1,10 @@
 import './style.css'
 import { WebGLRenderer, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, Vector4 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { gltf_loader } from "./glb_loader"
 import { Debug } from "./Debug"
-
-import vs_plane from './shader/vs_plane.vert?raw'
-import fs_plane from './shader/fs_plane.frag?raw'
-import MSH_Monkey_url from "./model/MSH_Monkey.glb?url"
+import { StartingShaderMateiral } from './/materials/StartingShaderMateiral'
+import { GLBModel } from './/objects/GLBModel'
+import MSH_Monkey_url from './model/MSH_Monkey.glb?url'
 
 export class Sketch {
   private renderer: WebGLRenderer
@@ -22,8 +20,8 @@ export class Sketch {
   private mat_plane: ShaderMaterial
   private geo_plane: PlaneGeometry
   private msh_plane: Mesh
-  private debug: Debug
-  private msh_monkey: Mesh
+  private _debug: Debug
+  private _GLBModel: GLBModel
 
   constructor(options: { dom: HTMLElement }) {
     this.scene = new Scene()
@@ -37,7 +35,7 @@ export class Sketch {
     this.renderer.physicallyCorrectLights = true
     this.render = this.render.bind(this)
     this.imageAspect = 1
-    this.debug = new Debug()
+    this._debug = new Debug()
 
     this.container.appendChild(this.renderer.domElement)
     this.camera = new PerspectiveCamera(
@@ -60,7 +58,7 @@ export class Sketch {
 
 
   setupResize() {
-    window.addEventListener("resize", this.resize.bind(this))
+    window.addEventListener('resize', this.resize.bind(this))
   }
 
   resize() {
@@ -69,54 +67,20 @@ export class Sketch {
     this.renderer.setSize(this.width, this.height)
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.camera.aspect = this.width / this.height
-    
-
-    // image cover
-    let a1; let a2
-    if(this.height/this.width>this.imageAspect) {
-      a1 = (this.width/this.height) * this.imageAspect
-      a2 = 1
-    } else{
-      a1 = 1
-      a2 = (this.height/this.width) / this.imageAspect
-    }
-
-    this.mat_plane.uniforms.resolution.value.x = this.width
-    this.mat_plane.uniforms.resolution.value.y = this.height
-    this.mat_plane.uniforms.resolution.value.z = a1
-    this.mat_plane.uniforms.resolution.value.w = a2
 
     this.camera.updateProjectionMatrix()
   }
 
   addObjects() {
     let that = this
-    this.mat_plane = new ShaderMaterial({
-      side: DoubleSide,
-      uniforms: {
-        time: { value: 0 },
-        progress: { value: 0.6 },
-        resolution: { value: new Vector4() },
-      },
-      // wireframe: true,
-      // transparent: true,
-      vertexShader: vs_plane,
-      fragmentShader: fs_plane
-    })
 
+    this.mat_plane = new StartingShaderMateiral()
     this.geo_plane = new PlaneGeometry(1, 1, 10, 10)
-    this.msh_plane = new Mesh(this.geo_plane,this.mat_plane)
+    this.msh_plane = new Mesh(this.geo_plane, this.mat_plane)
     this.scene.add(this.msh_plane)
 
-    gltf_loader.load(MSH_Monkey_url, glb => {
-      this.msh_monkey = glb.scenes[0].children[0] as Mesh
-      this.msh_monkey.traverse(o=>{
-        if(o instanceof Mesh){
-          o.material = this.mat_plane;
-        }
-      })
-      this.scene.add(this.msh_monkey)
-    })
+    this._GLBModel = new GLBModel([{ model: MSH_Monkey_url}])
+    this.scene.add(this._GLBModel)
   }
 
   stop() {
@@ -134,12 +98,12 @@ export class Sketch {
     if (!this.isPlaying) return
     this.time += 0.05
     this.mat_plane.uniforms.time.value = this.time
-    this.mat_plane.uniforms.progress.value = this.debug.settings.progress
+    this.mat_plane.uniforms.progress.value = this._debug.settings.progress
     requestAnimationFrame(this.render)
     this.renderer.render(this.scene, this.camera)
   }
 }
 
 new Sketch({
-  dom: document.getElementById("app")!
+  dom: document.getElementById('app')!
 })
