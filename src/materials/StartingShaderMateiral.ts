@@ -5,13 +5,16 @@ float PI = 3.141592653589793238;
 
 uniform vec2 pixels;
 uniform float time;
+attribute vec3 a_instance_position;
 
 varying vec2 vUv;
 varying vec3 vPosition;
 
 void main() {
   vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  vec3 fianl_position = position;
+  fianl_position += a_instance_position;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4( fianl_position, 1.0 );
 }
 `
 

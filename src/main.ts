@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Debug } from "./Debug"
 import { StartingShaderMateiral } from './/materials/StartingShaderMateiral'
 import { GLBModel } from './/objects/GLBModel'
+import { DummyInstancedMesh } from './/objects/DummyInstancedMesh'
 import MSH_Monkey_url from './model/MSH_Monkey.glb?url'
 
 export class Sketch {
@@ -22,6 +23,7 @@ export class Sketch {
   private msh_plane: Mesh
   private _debug: Debug
   private _GLBModel: GLBModel
+  private _DummyInstancedMesh: DummyInstancedMesh
 
   constructor(options: { dom: HTMLElement }) {
     this.scene = new Scene()
@@ -42,7 +44,7 @@ export class Sketch {
       70,
       window.innerWidth / window.innerHeight,
       0.01,
-      5
+      1000
     )
 
     this.camera.position.set(0, 0, 3)
@@ -77,10 +79,14 @@ export class Sketch {
     this.mat_plane = new StartingShaderMateiral()
     this.geo_plane = new PlaneGeometry(1, 1, 10, 10)
     this.msh_plane = new Mesh(this.geo_plane, this.mat_plane)
-    this.scene.add(this.msh_plane)
+    // this.scene.add(this.msh_plane)
 
-    this._GLBModel = new GLBModel([{ model: MSH_Monkey_url}])
-    this.scene.add(this._GLBModel)
+    // this._GLBModel = new GLBModel([{ model: MSH_Monkey_url}])
+    // this.scene.add(this._GLBModel)
+
+    this._DummyInstancedMesh = new DummyInstancedMesh()
+    this.scene.add(this._DummyInstancedMesh)
+    // console.log(this._DummyInstancedMesh)
   }
 
   stop() {
