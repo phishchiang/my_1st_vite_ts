@@ -1,18 +1,20 @@
-import { InstancedMesh, BoxGeometry, InstancedBufferAttribute } from 'three'
+import { InstancedMesh, BoxGeometry, BufferGeometry, InstancedBufferAttribute } from 'three'
 import { randFloat } from 'three/src/math/MathUtils'
 
 import { StartingShaderMateiral } from '../materials/StartingShaderMateiral'
 import { matrix4, vector3 } from '../glb_loader'
 
-export class DummyInstancedMesh extends InstancedMesh<BoxGeometry, StartingShaderMateiral> {
-  constructor() {
+export class DummyInstancedMesh extends InstancedMesh<BufferGeometry, StartingShaderMateiral> {
+  _instancedGeometry: BufferGeometry
+
+  constructor(_instancedGeometry: BufferGeometry) {
     const instance_count = 100
     let instance_position = new Float32Array(instance_count * 3);
-    super(new BoxGeometry(0.25, 0.25, 0.25), new StartingShaderMateiral(), instance_count)
+    super(_instancedGeometry, new StartingShaderMateiral(), instance_count)
+    // super(new BoxGeometry(0.25, 0.25, 0.25), new StartingShaderMateiral(), instance_count)
 
     // for (let i = 0; i < this.count; ++i) {
     //   matrix4.makeTranslation(randFloat(-4, 4), randFloat(-4, 4), randFloat(-4, 2)).scale(vector3.setScalar(0.05))
-
     //   this.setMatrixAt(i, matrix4)
     // }
 

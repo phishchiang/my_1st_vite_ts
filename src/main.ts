@@ -1,10 +1,10 @@
 import './style.css'
-import { WebGLRenderer, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, Vector4 } from 'three'
+import { WebGLRenderer, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, BufferGeometry} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Debug } from "./Debug"
 import { StartingShaderMateiral } from './/materials/StartingShaderMateiral'
-import { GLBModel } from './/objects/GLBModel'
 import { DummyInstancedMesh } from './/objects/DummyInstancedMesh'
+import { gltfLoader } from "./glb_loader"
 import MSH_Monkey_url from './model/MSH_Monkey.glb?url'
 
 export class Sketch {
@@ -22,7 +22,6 @@ export class Sketch {
   private geo_plane: PlaneGeometry
   private msh_plane: Mesh
   private _debug: Debug
-  private _GLBModel: GLBModel
   private _DummyInstancedMesh: DummyInstancedMesh
 
   constructor(options: { dom: HTMLElement }) {
@@ -58,7 +57,6 @@ export class Sketch {
     this.setupResize()
   }
 
-
   setupResize() {
     window.addEventListener('resize', this.resize.bind(this))
   }
@@ -73,20 +71,18 @@ export class Sketch {
     this.camera.updateProjectionMatrix()
   }
 
-  addObjects() {
+  async addObjects() {
     let that = this
 
-    this.mat_plane = new StartingShaderMateiral()
-    this.geo_plane = new PlaneGeometry(1, 1, 10, 10)
-    this.msh_plane = new Mesh(this.geo_plane, this.mat_plane)
+    // this.mat_plane = new StartingShaderMateiral()
+    // this.geo_plane = new PlaneGeometry(1, 1, 10, 10)
+    // this.msh_plane = new Mesh(this.geo_plane, this.mat_plane)
     // this.scene.add(this.msh_plane)
 
-    // this._GLBModel = new GLBModel([{ model: MSH_Monkey_url}])
-    // this.scene.add(this._GLBModel)
-
-    this._DummyInstancedMesh = new DummyInstancedMesh()
+    const gltf = await gltfLoader.loadAsync(MSH_Monkey_url)
+    const geometry = (gltf.scene.children[0] as Mesh).geometry
+    this._DummyInstancedMesh = new DummyInstancedMesh(geometry)
     this.scene.add(this._DummyInstancedMesh)
-    // console.log(this._DummyInstancedMesh)
   }
 
   stop() {
@@ -103,8 +99,10 @@ export class Sketch {
   render() {
     if (!this.isPlaying) return
     this.time += 0.05
-    this.mat_plane.uniforms.time.value = this.time
-    this.mat_plane.uniforms.progress.value = this._debug.settings.progress
+    if(this._DummyInstancedMesh){
+      this._DummyInstancedMesh.material.uniforms.time.value = this.time
+      this._DummyInstancedMesh.material.uniforms.progress.value = this._debug.settings.progress
+    }
     requestAnimationFrame(this.render)
     this.renderer.render(this.scene, this.camera)
   }
