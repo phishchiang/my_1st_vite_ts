@@ -6,12 +6,15 @@ float PI = 3.141592653589793238;
 uniform vec2 pixels;
 uniform float time;
 attribute vec3 a_instance_position;
+attribute vec3 a_vertex_color;
 
 varying vec2 vUv;
 varying vec3 vPosition;
+varying vec3 v_color;
 
 void main() {
   vUv = uv;
+  v_color = a_vertex_color;
   vec3 fianl_position = position;
   fianl_position += a_instance_position;
   gl_Position = projectionMatrix * modelViewMatrix * vec4( fianl_position, 1.0 );
@@ -28,10 +31,11 @@ uniform vec4 resolution;
 
 varying vec2 vUv;
 varying vec3 vPosition;
+varying vec3 v_color;
 
 void main()	{
 	// vec2 newUV = (vUv - vec2(0.5))*resolution.zw + vec2(0.5);
-	gl_FragColor = vec4(vUv,progress,1.);
+	gl_FragColor = vec4(v_color,1.);
 }
 `
 

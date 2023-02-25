@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Debug } from "./Debug"
 import { StartingShaderMateiral } from './/materials/StartingShaderMateiral'
 import { DummyInstancedMesh } from './/objects/DummyInstancedMesh'
+import { BasicGeo } from './/objects/BasicGeo'
 import { gltfLoader } from "./glb_loader"
 import MSH_Monkey_url from './model/MSH_Monkey.glb?url'
 
@@ -23,6 +24,7 @@ export class Sketch {
   private msh_plane: Mesh
   private _debug: Debug
   private _DummyInstancedMesh: DummyInstancedMesh
+  private _BasicGeo: BasicGeo
 
   constructor(options: { dom: HTMLElement }) {
     this.scene = new Scene()
@@ -81,8 +83,10 @@ export class Sketch {
 
     const gltf = await gltfLoader.loadAsync(MSH_Monkey_url)
     const geometry = (gltf.scene.children[0] as Mesh).geometry
-    this._DummyInstancedMesh = new DummyInstancedMesh(geometry)
+    this._BasicGeo = new BasicGeo()
+    this._DummyInstancedMesh = new DummyInstancedMesh(this._BasicGeo)
     this.scene.add(this._DummyInstancedMesh)
+    // console.log(this._BasicGeo)
   }
 
   stop() {
