@@ -1,8 +1,9 @@
 import './style.css'
-import { WebGLRenderer, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, BufferGeometry} from 'three'
+import { WebGLRenderer,WebGLRenderTarget, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, BufferGeometry, Vector2} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Debug } from "./Debug"
 import { StartingShaderMateiral } from './/materials/StartingShaderMateiral'
+import { PostMaterial } from './/materials/PostMaterial'
 import { DummyInstancedMesh } from './/objects/DummyInstancedMesh'
 import { BasicGeo } from './/objects/BasicGeo'
 import { gltfLoader } from "./glb_loader"
@@ -25,13 +26,15 @@ export class Sketch {
   private _debug: Debug
   private _DummyInstancedMesh: DummyInstancedMesh
   private _BasicGeo: BasicGeo
+  private _renderTarget?: WebGLRenderTarget
+  private _quad?: Mesh<BufferGeometry, PostMaterial>
 
   constructor(options: { dom: HTMLElement }) {
     this.scene = new Scene()
     this.container = options.dom
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
-    this.renderer = new WebGLRenderer()
+    this.renderer = new WebGLRenderer( { antialias: true })
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
     this.renderer.setClearColor(0x000000, 1)
@@ -54,9 +57,16 @@ export class Sketch {
     this.isPlaying = true
 
     this.addObjects()
+    this.initpost()
     this.resize()
     this.render()
     this.setupResize()
+  }
+
+  initpost() {
+    this._renderTarget = new WebGLRenderTarget(this.width, this.height)
+    this._quad = new Mesh(new PlaneGeometry(2, 2), new PostMaterial())
+    this._quad?.material.uniforms.u_size.value.copy(new Vector2(this.width, this.height))
   }
 
   setupResize() {
@@ -69,6 +79,9 @@ export class Sketch {
     this.renderer.setSize(this.width, this.height)
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.camera.aspect = this.width / this.height
+
+    this._renderTarget?.setSize(this.width, this.height)
+    this._quad?.material.uniforms.u_size.value.copy(new Vector2(this.width, this.height))
 
     this.camera.updateProjectionMatrix()
   }
@@ -108,7 +121,15 @@ export class Sketch {
       this._DummyInstancedMesh.material.uniforms.progress.value = this._debug.settings.progress
     }
     requestAnimationFrame(this.render)
+    // this.renderer.render(this.scene, this.camera)
+
+    this.renderer.setRenderTarget(this._renderTarget!)
+    this.renderer.clear(false, true, false)
     this.renderer.render(this.scene, this.camera)
+
+    this._quad!.material.uniforms.u_texture.value = this._renderTarget!.texture
+    this.renderer.setRenderTarget(null)
+    this.renderer.render(this._quad!, this.camera)
   }
 }
 
