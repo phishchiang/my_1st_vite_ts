@@ -21,6 +21,6 @@ export class BasicGeo extends BufferGeometry{
 
     this.setAttribute( 'position', new BufferAttribute( points, 3 ))
     this.setAttribute( 'a_vertex_color', new BufferAttribute( vertex_color, 3 ))
-    console.log(this)
+    // console.log(this)
   }
 }

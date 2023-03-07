@@ -1,11 +1,13 @@
 import './style.css'
-import { WebGLRenderer,WebGLRenderTarget, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, BufferGeometry, Vector2} from 'three'
+import { WebGLRenderer,WebGLRenderTarget, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, BufferGeometry, Vector2, Points} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Debug } from "./Debug"
 import { StartingShaderMateiral } from './/materials/StartingShaderMateiral'
+import { PointsShaderMateiral } from './/materials/PointsShaderMateiral'
 import { PostMaterial } from './/materials/PostMaterial'
 import { DummyInstancedMesh } from './/objects/DummyInstancedMesh'
 import { BasicGeo } from './/objects/BasicGeo'
+import { PointsGeo } from './/objects/PointsGeo'
 import { gltfLoader } from "./glb_loader"
 import MSH_Monkey_url from './model/MSH_Monkey.glb?url'
 
@@ -23,9 +25,11 @@ export class Sketch {
   private mat_plane: ShaderMaterial
   private geo_plane: PlaneGeometry
   private msh_plane: Mesh
+  private _point_msh: Points
   private _debug: Debug
   private _DummyInstancedMesh: DummyInstancedMesh
   private _BasicGeo: BasicGeo
+  private _PointsGeo: PointsGeo
   private _renderTarget?: WebGLRenderTarget
   private _quad?: Mesh<BufferGeometry, PostMaterial>
 
@@ -94,12 +98,19 @@ export class Sketch {
     // this.msh_plane = new Mesh(this.geo_plane, this.mat_plane)
     // this.scene.add(this.msh_plane)
 
+    // GLB loading
     const gltf = await gltfLoader.loadAsync(MSH_Monkey_url)
     const geometry = (gltf.scene.children[0] as Mesh).geometry
     this._BasicGeo = new BasicGeo()
+
+    // Instanced Mesh
     this._DummyInstancedMesh = new DummyInstancedMesh(this._BasicGeo)
     this.scene.add(this._DummyInstancedMesh)
-    // console.log(this._BasicGeo)
+
+    // WebGL Points
+    this._PointsGeo = new PointsGeo()
+    this._point_msh = new Points(this._PointsGeo, new PointsShaderMateiral())
+    this.scene.add(this._point_msh)
   }
 
   stop() {

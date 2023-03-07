@@ -25,7 +25,6 @@ export class DummyInstancedMesh extends InstancedMesh<BufferGeometry, StartingSh
       const z = (Math.random() - 0.5) * 5.0;
       instance_position.set([x, y, z], i3);
     }
-    console.log(this)
     this.instanceMatrix.needsUpdate = true
     this.geometry.setAttribute('a_instance_position', new InstancedBufferAttribute(instance_position, 3, false));
   }
