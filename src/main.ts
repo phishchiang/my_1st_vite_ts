@@ -1,5 +1,17 @@
 import './style.css'
-import { WebGLRenderer,WebGLRenderTarget, Scene, PerspectiveCamera, ShaderMaterial, PlaneGeometry, Mesh, DoubleSide, BufferGeometry, Vector2, Points} from 'three'
+import { 
+  WebGLRenderer,
+  WebGLRenderTarget, 
+  Scene, 
+  PerspectiveCamera, 
+  ShaderMaterial, 
+  PlaneGeometry, 
+  Mesh, 
+  DoubleSide, 
+  BufferGeometry, 
+  Vector2, 
+  Points, 
+} from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Debug } from "./Debug"
 import { StartingShaderMateiral } from './/materials/StartingShaderMateiral'
@@ -25,13 +37,14 @@ export class Sketch {
   private mat_plane: ShaderMaterial
   private geo_plane: PlaneGeometry
   private msh_plane: Mesh
-  private _point_msh: Points
   private _debug: Debug
   private _DummyInstancedMesh: DummyInstancedMesh
   private _BasicGeo: BasicGeo
   private _PointsGeo: PointsGeo
+  private _point_msh: Points<PointsGeo, PointsShaderMateiral>
   private _renderTarget?: WebGLRenderTarget
   private _quad?: Mesh<BufferGeometry, PostMaterial>
+  private _pointsMat: PointsShaderMateiral
 
   constructor(options: { dom: HTMLElement }) {
     this.scene = new Scene()
@@ -109,7 +122,9 @@ export class Sketch {
 
     // WebGL Points
     this._PointsGeo = new PointsGeo()
-    this._point_msh = new Points(this._PointsGeo, new PointsShaderMateiral())
+    this._pointsMat = new PointsShaderMateiral()
+    this._point_msh = new Points(this._PointsGeo, this._pointsMat)
+    this._point_msh.material.uniforms.u_viewport.value.copy(new Vector2(this.width, this.height))
     this.scene.add(this._point_msh)
   }
 

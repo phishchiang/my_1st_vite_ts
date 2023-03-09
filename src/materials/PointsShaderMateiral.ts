@@ -1,4 +1,4 @@
-import { Color, IUniform, RawShaderMaterial, ShaderMaterial, Texture, Vector4, DoubleSide } from 'three'
+import { Color, IUniform, RawShaderMaterial, ShaderMaterial, Texture, Vector2, DoubleSide } from 'three'
 
 const vertexShader = /* glsl */ `
 float PI = 3.141592653589793238;
@@ -7,18 +7,24 @@ uniform vec2 pixels;
 uniform float time;
 attribute vec3 a_instance_position;
 attribute vec3 a_vertex_color;
+uniform vec2 u_viewport;
 
-varying vec2 vUv;
 varying vec3 vPosition;
 varying vec3 v_color;
 
-void main() {
-  vUv = uv;
-  v_color = a_vertex_color;
-  // gl_PointSize = 1000. * ( 1. / - mvPosition.z );
-  gl_PointSize = 10.0;
+float particleSize (vec4 screenPos, mat4 mtxProj, vec2 viewport, float radius){
+  return viewport.y * mtxProj[1][1] * radius / screenPos.w;
+}
 
+void main() {
+  v_color = a_vertex_color;
+
+  vec4 mvPosition = modelViewMatrix * vec4( position, 1. );
+  // gl_PointSize = 100. * ( 1. / - mvPosition.z );
+  // gl_PointSize = 10.0;
+  
   gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  gl_PointSize = particleSize(gl_Position, projectionMatrix, u_viewport, 0.01);
 }
 `
 
@@ -27,16 +33,15 @@ float PI = 3.141592653589793238;
 
 uniform float time;
 uniform float progress;
-uniform sampler2D texture1;
-uniform vec4 resolution;
 
-varying vec2 vUv;
 varying vec3 vPosition;
 varying vec3 v_color;
 
 void main()	{
-	// vec2 newUV = (vUv - vec2(0.5))*resolution.zw + vec2(0.5);
-	gl_FragColor = vec4(1.0);
+  float uv_center = distance(gl_PointCoord, vec2(0.5));
+  if(uv_center > 0.5) discard;
+
+	gl_FragColor = vec4(gl_PointCoord, 0.0, 1.0);
 }
 `
 
@@ -44,14 +49,14 @@ export class PointsShaderMateiral extends ShaderMaterial {
   declare uniforms: {
     time: IUniform<number>
     progress: IUniform<number>
-    resolution: IUniform<Vector4>
+    u_viewport: IUniform<Vector2>
   }
 
   constructor() {
     const uniforms: PointsShaderMateiral['uniforms'] = {
       time: { value: 0 },
       progress: { value: 0.6 },
-      resolution: { value: new Vector4() },
+      u_viewport: { value: new Vector2() },
     }
 
     super({
