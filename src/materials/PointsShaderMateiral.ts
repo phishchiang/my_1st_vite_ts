@@ -1,7 +1,13 @@
 import { Color, IUniform, RawShaderMaterial, ShaderMaterial, Texture, Vector2, DoubleSide } from 'three'
 
 const vertexShader = /* glsl */ `
+precision highp float;
 float PI = 3.141592653589793238;
+
+uniform mat4 projectionMatrix;
+uniform mat4 modelViewMatrix;
+attribute vec3 position;
+attribute vec2 uv;
 
 uniform vec2 pixels;
 uniform float time;
@@ -29,6 +35,7 @@ void main() {
 `
 
 const fragmentShader = /* glsl */ `
+precision highp float;
 float PI = 3.141592653589793238;
 
 uniform float time;
@@ -45,7 +52,7 @@ void main()	{
 }
 `
 
-export class PointsShaderMateiral extends ShaderMaterial {
+export class PointsShaderMateiral extends RawShaderMaterial {
   declare uniforms: {
     time: IUniform<number>
     progress: IUniform<number>
