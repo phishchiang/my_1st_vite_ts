@@ -14,13 +14,13 @@ import {
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Debug } from "./Debug"
-import { StartingShaderMateiral } from './/materials/StartingShaderMateiral'
-import { PointsShaderMateiral } from './/materials/PointsShaderMateiral'
-import { PostMaterial } from './/materials/PostMaterial'
-import { DummyInstancedMesh } from './/objects/DummyInstancedMesh'
-import { BasicGeo } from './/objects/BasicGeo'
-import { PointsGeo } from './/objects/PointsGeo'
-import { gltfLoader } from "./glb_loader"
+import { StartingShaderMateiral } from './materials/StartingShaderMateiral'
+import { PointsShaderMateiral } from './materials/PointsShaderMateiral'
+import { PostMaterial } from './materials/PostMaterial'
+import { DummyInstancedMesh } from './objects/DummyInstancedMesh'
+import { BasicGeo } from './objects/BasicGeo'
+import { PointsGeo } from './objects/PointsGeo'
+import { gltfLoader } from './glb_loader'
 import MSH_Monkey_url from './model/MSH_Monkey.glb?url'
 
 export class Sketch {
