@@ -7,15 +7,15 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "moduleResolution": "Node", // "bundler" is default; Netlify deploy
+    // "allowImportingTsExtensions": true, // Netlify deploy
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false, // my quick setup
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
